@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Text, View, FlatList, Dimensions, StyleSheet } from 'react-native';
-import {MainScrollItem} from './main-scroll-item'
+import {MainScroll} from './main-scroll';
 
 const dataFromProps = [{value: 'burger', type: 'fast'}, {value: 'nuggets', type: 'fast'}, {value: 'meat', type: 'restaurant'}];
 
@@ -13,36 +13,19 @@ export class ScrollPicker extends Component {
         scrollWidth: Dimensions.get('screen').width,
     };
 
-    getItemLayout = (data, index) => {
-        return ({ length: this.state.scrollWidth, offset: this.state.scrollWidth * index, index })
-    };
-
-    handleScrollBeginDrag = (event) => {
-        this.setState({
-            beginDragOffset: event.nativeEvent.contentOffset.x
-        })
-    };
-
-    handleScrollEndDrag = (event) => {
-        const {beginDragOffset, currentIndex, data} = this.state;
-        let newIndex = currentIndex;
-        let offsetDiff = event.nativeEvent.contentOffset.x - beginDragOffset;
-        if(Math.abs(offsetDiff) > this.state.scrollWidth/4) {
-            newIndex = offsetDiff < 0 ? currentIndex - 1 : currentIndex + 1
-        }
-
-        this.setState({
-            currentIndex: newIndex,
-            data: data.length - 2 !== currentIndex ? data : [...data, ...dataFromProps]
-        }, ()=> this.flatListRef.scrollToIndex({animated: true, index: this.state.currentIndex}));
-    };
+    handleUpdateScrollPosition = (currentIndex) => {
+        this.setState((prevState) => ({
+            data: prevState.data.length - 2 !== currentIndex ? prevState.data : [...prevState.data, ...dataFromProps],
+            currentIndex
+        }))
+    }
 
     handleChangeOrientation = () => {
-        const dim = Dimensions.get('screen');
         this.setState({
-            scrollWidth: dim.width
+            scrollWidth: Dimensions.get('screen').width
         })
     };
+
 
     render() {
         console.log('data: ', this.state.data);
@@ -51,20 +34,11 @@ export class ScrollPicker extends Component {
                 <View style={styles.header}>
                     <Text>Header</Text>
                 </View>
-                <FlatList
-                    style={styles.scrollContainer}
-                    ref={(ref) => { this.flatListRef = ref; }}
-                    keyExtractor={(item, index) => `${index}_${item.value.toString()}`}
-                    getItemLayout={this.getItemLayout}
-                    initialScrollIndex={0}
-                    initialNumToRender={0}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    //onScroll={(event) => console.log(event.nativeEvent.contentOffset)}
-                    onScrollBeginDrag={this.handleScrollBeginDrag}
-                    onScrollEndDrag={this.handleScrollEndDrag}
-                    renderItem={(itemInfo) => <MainScrollItem itemInfo={itemInfo}/>}
+                <MainScroll
                     data={this.state.data}
+                    currentIndex={this.state.currentIndex}
+                    scrollWidth={this.state.scrollWidth}
+                    updateScrollPosition = {this.handleUpdateScrollPosition}
                 />
                 <View style={styles.footer}>
                     <Text>Footer</Text>
@@ -80,10 +54,6 @@ const styles = StyleSheet.create({
     },
     header: {
         flex: 1,
-    },
-    scrollContainer: {
-        flex: 1,
-        backgroundColor: 'red'
     },
     footer: {
         flex: 6
