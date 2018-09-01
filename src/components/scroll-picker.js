@@ -4,20 +4,12 @@ import {MainScroll} from './main-scroll';
 import {FiltersScroll} from "./filters-scroll";
 
 const dataFromServer = [
-        {value: '1', type: 'fast1'},
-        {value: '2', type: 'fast2'},
-        {value: '3', type: 'restaurant'},
-        {value: '4', type: 'fast'},
-        {value: '5', type: 'fast'},
-        {value: '6', type: 'restaurant'},
-        {value: '7', type: 'fast'},
-        {value: '8', type: 'fast3'},
-        {value: '9', type: 'restaurant'},
-        {value: '10', type: 'restaurant'},
-        {value: '11', type: 'fast4'},
-        {value: '12', type: 'fast45'},
-        {value: '13', type: 'restaurant'},
-        {value: '14', type: 'restaurant'}
+        {title: 'Black burger', img: require('../../images/burger.png'), type: 'Burgers'},
+        {title: 'Cheese burger', img: require('../../images/burger2.png'), type: 'Burgers'},
+        {title: 'French fries', img: require('../../images/french-fries.png'), type: 'French fries'},
+        {title: 'Coca cola', img: require('../../images/cola.png'), type: 'Drinks'},
+        {title: 'Green burger', img: require('../../images/burger3.png'), type: 'Burgers'},
+        {title: 'Sprite', img: require('../../images/sprite.png'), type: 'Drinks'}
     ];
 
 const compareItems = (item1,item2) => {
@@ -28,7 +20,6 @@ const compareItems = (item1,item2) => {
     return 0;
 };
 
-
 export class ScrollPicker extends Component {
 
     state = {
@@ -36,14 +27,22 @@ export class ScrollPicker extends Component {
         data: dataFromServer.sort(compareItems),
         filters: [...new Set(dataFromServer.map((item)=>item.type))].sort(),
         activeFilter: dataFromServer.sort(compareItems)[0].type,
-        beginDragOffset: 0,
         scrollWidth: Dimensions.get('screen').width,
     };
 
+    handleChangeFilter = (newFilter) => {
+        let newIndex = this.state.data.findIndex((item)=> item.type === newFilter);
+        console.log('newIndex ', newIndex);
+        this.setState({
+            data: this.state.data.length - 1 < newIndex ? this.state.data : [...this.state.data, ...dataFromServer],
+            currentIndex: newIndex,
+            activeFilter: newFilter
+        })
+    };
 
     handleUpdateScrollPosition = (currentIndex) => {
         this.setState((prevState) => ({
-            data: prevState.data.length - 2 !== currentIndex ? prevState.data : [...prevState.data, ...dataFromServer],
+            data: prevState.data.length - 1 < currentIndex ? prevState.data : [...prevState.data, ...dataFromServer],
             currentIndex,
             activeFilter: prevState.data[currentIndex].type
         }))
@@ -55,8 +54,8 @@ export class ScrollPicker extends Component {
         })
     };
 
-
     render() {
+        console.log(this.state.data);
         return (
             <View onLayout={this.handleChangeOrientation} style={styles.container}>
                 <View style={{flex: 1}}>
@@ -67,8 +66,9 @@ export class ScrollPicker extends Component {
                 <View style={{flex: 1}}>
                     <FiltersScroll
                         data={this.state.filters}
-                        scrollWidth={this.state.scrollWidth}
+                        scrollWidth={this.state.scrollWidth/7}
                         activeFilter={this.state.activeFilter}
+                        onFilterChange={this.handleChangeFilter}
                     />
                 </View>
                 <View style={{flex: 3}}>

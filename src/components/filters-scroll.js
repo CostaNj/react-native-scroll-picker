@@ -9,14 +9,15 @@ export class FiltersScroll extends Component {
     }
 
     getItemLayout = (data, index) => {
-        return ({ length: this.props.scrollWidth/7, offset: this.props.scrollWidth/7 * index, index })
+        const {scrollWidth} = this.props;
+        return ({ length: scrollWidth, offset: scrollWidth * index, index })
     };
 
     render() {
-        let filterWidth = this.props.scrollWidth/7;
+        let {scrollWidth} = this.props;
         return (
             <FlatList
-                style={[styles.scrollContainer, {marginStart: filterWidth, marginEnd: filterWidth}]}
+                style={[styles.scrollContainer, {marginStart: scrollWidth, marginEnd: scrollWidth}]}
                 ref={(ref) => { this.filtersListRef = ref; }}
                 keyExtractor={(item, index) => `${index}_${item.toString()}`}
                 initialScrollIndex={0}
@@ -24,7 +25,14 @@ export class FiltersScroll extends Component {
                 getItemLayout={this.getItemLayout}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                renderItem={(itemInfo) => <FilterScrollItem itemInfo={itemInfo} filterWidth={filterWidth} activeFilter={this.props.activeFilter}/>}
+                renderItem={(itemInfo) =>
+                    <FilterScrollItem
+                        itemInfo={itemInfo}
+                        filterWidth={scrollWidth}
+                        isActiveFilter={this.props.activeFilter === itemInfo.item}
+                        onFilterChange={this.props.onFilterChange}
+                    />
+                }
                 data={this.props.data}
             />
         )

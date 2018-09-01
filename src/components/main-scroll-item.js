@@ -1,10 +1,11 @@
 import React from 'react'
-import {StyleSheet, View, Text, Dimensions} from "react-native";
+import {StyleSheet, View, Text, Dimensions,Image} from "react-native";
 
 
 export const MainScrollItem = ({itemInfo}) => (
     <View style={[styles.scrollItem, {width: Dimensions.get('screen').width}]}>
-        <Text>{itemInfo.item.value}</Text>
+        <Image style ={styles.imgStyle} source={itemInfo.item.img} resizeMode="contain"/>
+        <Text>{itemInfo.item.title}</Text>
     </View>
 );
 
@@ -14,4 +15,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
     },
+    imgStyle: {
+        height: '85%'
+    }
 });

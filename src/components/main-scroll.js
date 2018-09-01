@@ -39,7 +39,7 @@ export class MainScroll extends Component {
             <FlatList
                 style={styles.scrollContainer}
                 ref={(ref) => { this.flatListRef = ref; }}
-                keyExtractor={(item, index) => `${index}_${item.value.toString()}`}
+                keyExtractor={(item, index) => `${index}_${item.title.toString()}`}
                 getItemLayout={this.getItemLayout}
                 initialScrollIndex={0}
                 initialNumToRender={0}
