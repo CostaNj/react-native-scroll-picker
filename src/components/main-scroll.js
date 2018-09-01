@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Dimensions, FlatList, StyleSheet} from 'react-native'
+import {FlatList, StyleSheet} from 'react-native'
 import {MainScrollItem} from './main-scroll-item'
 
 export class MainScroll extends Component {
@@ -24,7 +24,7 @@ export class MainScroll extends Component {
 
     handleScrollEndDrag = (event) => {
         const {beginDragOffset} = this.state;
-        const {data, currentIndex} = this.props;
+        const {currentIndex} = this.props;
         let newIndex = this.props.currentIndex;
         let offsetDiff = event.nativeEvent.contentOffset.x - beginDragOffset;
         if(Math.abs(offsetDiff) > this.props.scrollWidth/4) {
