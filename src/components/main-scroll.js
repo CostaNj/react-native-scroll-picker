@@ -24,13 +24,11 @@ export class MainScroll extends Component {
 
     handleScrollEndDrag = (event) => {
         const {beginDragOffset} = this.state;
-        const {currentIndex} = this.props;
         let newIndex = this.props.currentIndex;
         let offsetDiff = event.nativeEvent.contentOffset.x - beginDragOffset;
         if(Math.abs(offsetDiff) > this.props.scrollWidth/4) {
-            newIndex = offsetDiff < 0 ? currentIndex - 1 : currentIndex + 1
+            offsetDiff < 0 ? newIndex-- : newIndex++;
         }
-
         this.props.updateScrollPosition(newIndex)
     };
 
@@ -45,7 +43,6 @@ export class MainScroll extends Component {
                 initialNumToRender={0}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                //onScroll={(event) => console.log(event.nativeEvent.contentOffset)}
                 onScrollBeginDrag={this.handleScrollBeginDrag}
                 onScrollEndDrag={this.handleScrollEndDrag}
                 renderItem={(itemInfo) => <MainScrollItem itemInfo={itemInfo}/>}
@@ -57,7 +54,6 @@ export class MainScroll extends Component {
 
 const styles = StyleSheet.create({
     scrollContainer: {
-        flex: 1,
-        backgroundColor: 'red'
+        flex: 1
     }
 });

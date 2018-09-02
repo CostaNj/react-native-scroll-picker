@@ -41,7 +41,6 @@ export class FiltersScroll extends Component {
 
 const styles = StyleSheet.create({
     scrollContainer: {
-        flex: 1,
-        backgroundColor: 'blue',
+        flex: 1
     }
 });
