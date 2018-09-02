@@ -6,6 +6,7 @@ export class MainScroll extends Component {
 
     state = {
         beginDragOffset: 0,
+        offset: 100
     };
 
     componentWillReceiveProps(newProps) {
@@ -32,10 +33,27 @@ export class MainScroll extends Component {
         this.props.updateScrollPosition(newIndex)
     };
 
+    handleScroll = (event) => {
+        this.setState({
+            offset: event.nativeEvent.contentOffset.x
+        })
+    };
+
+    calcBackgroundColor = () => {
+        const {offset} = this.state;
+        const {scrollWidth} = this.props;
+        return `rgb(
+            ${150 - Math.sin(Math.PI*offset/scrollWidth) * 100},
+            ${150 - Math.cos(Math.PI*offset/scrollWidth) * 100},
+            ${150 - Math.sin(Math.PI*offset/scrollWidth/4) * 100}
+        )`
+    };
+
     render() {
+
         return (
             <FlatList
-                style={styles.scrollContainer}
+                style={[styles.scrollContainer, {backgroundColor: this.calcBackgroundColor()}]}
                 ref={(ref) => { this.flatListRef = ref; }}
                 keyExtractor={(item, index) => `${index}_${item.title.toString()}`}
                 getItemLayout={this.getItemLayout}
@@ -43,6 +61,7 @@ export class MainScroll extends Component {
                 initialNumToRender={0}
                 horizontal
                 showsHorizontalScrollIndicator={false}
+                onScroll={this.handleScroll}
                 onScrollBeginDrag={this.handleScrollBeginDrag}
                 onScrollEndDrag={this.handleScrollEndDrag}
                 renderItem={(itemInfo) => <MainScrollItem itemInfo={itemInfo}/>}
