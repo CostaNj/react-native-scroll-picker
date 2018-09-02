@@ -34,30 +34,33 @@ export class ScrollPicker extends Component {
         filters: [...new Set(dataFromServer.map((item)=>item.type))].sort(),
         activeFilter: dataFromServer.sort(compareFilters)[0].type,
         scrollWidth: Dimensions.get('screen').width,
-        indicatorIndex: 0
+        indicatorIndex: 0,
+        isNewFilter: false
     };
 
     handleChangeFilter = (newFilter) => {
         let newIndex = this.state.data.findIndex((item)=> item.type === newFilter);
-        this.setState({
-            data: this.state.data.length - 1 > newIndex ? this.state.data : [...this.state.data, ...dataFromServer],
+        this.setState((prevState) => ({
+            data: prevState.data.length - 1 > newIndex ? prevState.data : [...prevState.data, ...dataFromServer],
             currentIndex: newIndex,
             activeFilter: newFilter,
-            indicatorIndex: 0
-        })
+            indicatorIndex: 0,
+            isNewFilter: prevState.activeFilter !== newFilter
+        }))
     };
 
     handleUpdateScrollPosition = (newIndex) => {
-        this.setState({
-            data: this.state.data.length - 1 > newIndex ? this.state.data : [...this.state.data, ...dataFromServer],
+        this.setState((prevState) => ({
+            data: prevState.data.length - 1 > newIndex ? prevState.data : [...prevState.data, ...dataFromServer],
             currentIndex: newIndex,
-            activeFilter: this.state.data[newIndex].type,
-            indicatorIndex: this.calcNewIndicatorIndex(newIndex)
-        })
+            activeFilter: prevState.data[newIndex].type,
+            indicatorIndex: this.calcNewIndicatorIndex(newIndex, prevState),
+            isNewFilter: prevState.activeFilter !== prevState.data[newIndex].type
+        }))
     };
 
-    calcNewIndicatorIndex = (newIndex) => {
-        const {currentIndex, indicatorIndex, data, activeFilter} = this.state;
+    calcNewIndicatorIndex = (newIndex, prevState) => {
+        const {currentIndex, indicatorIndex, data, activeFilter} = prevState;
         if(newIndex > currentIndex) {
             return this.getFilterByIndex(newIndex) === activeFilter ?  indicatorIndex + 1 : 0;
         }
@@ -78,6 +81,13 @@ export class ScrollPicker extends Component {
             scrollWidth: Dimensions.get('screen').width
         })
     };
+
+    showDelayProgressIndicator = (isMounted) => !isMounted ? null :
+        <ProgressIndicator
+            items={this.getFilteredElements(this.state.activeFilter)}
+            indicatorIndex={this.state.indicatorIndex}
+            isNewFilter={this.state.isNewFilter}
+        />;
 
     render() {
         return (
@@ -100,10 +110,8 @@ export class ScrollPicker extends Component {
                     />
                 </View>
                 <View style={styles.progress}>
-                    <ProgressIndicator
-                        items={this.getFilteredElements(this.state.activeFilter)}
-                        indicatorIndex={this.state.indicatorIndex}
-                    />
+                    {this.showDelayProgressIndicator(this.state.currentIndex % 2 === 0)}
+                    {this.showDelayProgressIndicator(this.state.currentIndex % 2 === 1)}
                 </View>
                 <View style={styles.footer}/>
             </View>
